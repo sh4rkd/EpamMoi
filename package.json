@@ -1,0 +1,22 @@
+{
+  "name": "projecto-real",
+  "version": "1.0.0",
+  "description": "Cypress e2e suite for SauceDemo",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run cypress:run",
+    "cypress:open": "cypress open --e2e",
+    "cypress:run": "cypress run --e2e",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@types/node": "^24.10.1",
+    "cypress": "^15.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
