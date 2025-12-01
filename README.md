@@ -6,98 +6,98 @@
 [![Tests](https://img.shields.io/badge/tests-113%20total-blue.svg)]()
 [![Node](https://img.shields.io/badge/node-20.x-green.svg)](https://nodejs.org/)
 
-Framework de automatización E2E para pruebas de la aplicación [SauceDemo](https://www.saucedemo.com) utilizando Cypress, TypeScript y el patrón Page Object Model.
+End-to-end automation framework for testing the [SauceDemo](https://www.saucedemo.com) application using Cypress, TypeScript, and the Page Object Model pattern.
 
-## 📋 Tabla de Contenidos
+## 📋 Table of Contents
 
-- [Características](#características)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Prerequisitos](#prerequisitos)
-- [Instalación](#instalación)
-- [Ejecución de Tests](#ejecución-de-tests)
-- [Cobertura de Tests](#cobertura-de-tests)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Running Tests](#running-tests)
+- [Test Coverage](#test-coverage)
 - [CI/CD](#cicd)
-- [Arquitectura](#arquitectura)
-- [Contribuir](#contribuir)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
 
-## ✨ Características
+## ✨ Features
 
-- ✅ **Cypress 15.7.0** - Framework moderno y rápido para pruebas E2E
-- ✅ **TypeScript 5.9.3** - Seguridad de tipos con modo estricto
-- ✅ **Page Object Model** - Arquitectura mantenible con encapsulación estricta
-- ✅ **113+ Tests** - Cobertura completa de flujos críticos de usuario
-- ✅ **Custom Commands** - Utilidades reutilizables con soporte TypeScript completo
-- ✅ **Test Fixtures** - Testing basado en datos con datos centralizados
-- ✅ **CI/CD Ready** - Workflow de GitHub Actions con ejecución automática
-- ✅ **Rich Reporting** - Screenshots, videos y reportes HTML
-- ✅ **Múltiples Usuarios** - Tests para todos los tipos de usuario de SauceDemo
+- ✅ **Cypress 15.7.0** - Modern and fast E2E testing framework
+- ✅ **TypeScript 5.9.3** - Type safety with strict mode
+- ✅ **Page Object Model** - Maintainable architecture with strict encapsulation
+- ✅ **113+ Tests** - Comprehensive coverage of critical user flows
+- ✅ **Custom Commands** - Reusable test utilities with full TypeScript support
+- ✅ **Test Fixtures** - Data-driven testing with centralized test data
+- ✅ **CI/CD Ready** - GitHub Actions workflow with automatic test execution
+- ✅ **Rich Reporting** - Screenshots, videos, and HTML reports
+- ✅ **Multiple Users** - Tests for all SauceDemo user types
 
-## 📊 Cobertura de Tests
+## 📊 Test Coverage
 
-### Estadísticas Generales
+### General Statistics
 
-- **Total de Test Suites**: 6
-- **Total de Test Cases**: 113+
-- **Usuarios Testeados**: 6 tipos diferentes
-- **Distribución**: 60% escenarios positivos, 40% negativos/casos límite
+- **Total Test Suites**: 6
+- **Total Test Cases**: 113+
+- **Users Tested**: 6 different types
+- **Distribution**: 60% positive scenarios, 40% negative/edge cases
 
-### Desglose por Usuario
+### Breakdown by User
 
 #### Standard User (54 tests)
 
-- ✅ Autenticación
-- ✅ Inventario (ordenamiento, visualización)
-- ✅ Acciones del carrito (agregar, remover, badge)
-- ✅ Validación del carrito
-- ✅ Flujo completo de compra
-- ✅ Escenarios negativos de checkout
+- ✅ Authentication
+- ✅ Inventory (sorting, display)
+- ✅ Cart Actions (add, remove, badge)
+- ✅ Cart Validation
+- ✅ Complete Purchase Flow
+- ✅ Checkout Negative Scenarios
 
 #### Error User (10 tests)
 
-- ✅ Autenticación
-- ✅ Inventario
-- ✅ Validación de errores (comportamiento esperado sin mensajes de error)
+- ✅ Authentication
+- ✅ Inventory
+- ✅ Error Validation (expected behavior without error messages)
 
 #### Performance Glitch User (20 tests)
 
-- ✅ Autenticación con delays
-- ✅ Inventario con ordenamiento
-- ✅ Acciones del carrito con respuestas lentas
-- ✅ Validación del carrito
+- ✅ Authentication with delays
+- ✅ Inventory with sorting
+- ✅ Cart Actions with slow responses
+- ✅ Cart Validation
 
 #### Problem User (18 tests)
 
-- ✅ Autenticación
-- ✅ Inventario (con problemas de imágenes)
-- ✅ Acciones del carrito
-- ✅ Validación del carrito
-- ✅ Recuperación mediante reset
+- ✅ Authentication
+- ✅ Inventory (with image issues)
+- ✅ Cart Actions
+- ✅ Cart Validation
+- ✅ Recovery through reset
 
 #### Visual User (6 tests)
 
-- ✅ Autenticación
-- ✅ Detalles de productos
-- ✅ Consistencia visual
+- ✅ Authentication
+- ✅ Product Details
+- ✅ Visual Consistency
 
 #### Locked Out User (7 tests)
 
-- ✅ Bloqueo de autenticación
-- ✅ Manejo de mensajes de error
-- ✅ Prevención de navegación
+- ✅ Authentication Blocking
+- ✅ Error Message Handling
+- ✅ Navigation Prevention
 
-## 🏗️ Estructura del Proyecto
+## 🏗️ Project Structure
 
 ```
 cypress/
-├── e2e/                          # Especificaciones de tests
-│   ├── standard-user.cy.ts       # Tests del usuario estándar (54 tests)
-│   ├── error-user.cy.ts          # Tests del usuario con errores (10 tests)
-│   ├── performance-glitch-user.cy.ts  # Tests de rendimiento (20 tests)
-│   ├── problem-user.cy.ts        # Tests de problemas (18 tests)
-│   ├── visual-user.cy.ts         # Tests visuales (6 tests)
-│   └── locked-out-user.cy.ts     # Tests de bloqueo (7 tests)
-├── fixtures/                     # Datos de prueba
-│   └── users.json                # Credenciales de usuarios
+├── e2e/                          # Test specifications
+│   ├── standard-user.cy.ts       # Standard user tests (54 tests)
+│   ├── error-user.cy.ts          # Error user tests (10 tests)
+│   ├── performance-glitch-user.cy.ts  # Performance tests (20 tests)
+│   ├── problem-user.cy.ts        # Problem user tests (18 tests)
+│   ├── visual-user.cy.ts         # Visual user tests (6 tests)
+│   └── locked-out-user.cy.ts     # Locked out user tests (7 tests)
+├── fixtures/                     # Test data
+│   └── users.json                # User credentials
 ├── pages/                        # Page Object Models
 │   ├── LoginPage.ts
 │   ├── InventoryPage.ts
@@ -106,83 +106,83 @@ cypress/
 │   ├── CheckoutOverviewPage.ts
 │   ├── CheckoutCompletePage.ts
 │   └── ProductDetailsPage.ts
-└── support/                      # Comandos personalizados y configuración
+└── support/                      # Custom commands and configuration
     ├── commands.ts               # Custom Cypress commands
     ├── data/
-    │   └── users.ts              # Tipos y datos de usuarios
-    └── e2e.ts                    # Hooks globales y configuración
+    │   └── users.ts              # User types and data
+    └── e2e.ts                    # Global hooks and configuration
 ```
 
-## 📦 Prerequisitos
+## 📦 Prerequisites
 
-- **Node.js**: 20.x o superior ([Descargar](https://nodejs.org/))
-- **npm**: 10.x o superior (incluido con Node.js)
-- **Git**: Para control de versiones
-- **Chrome**: Última versión (navegador principal de pruebas)
+- **Node.js**: 20.x or higher ([Download](https://nodejs.org/))
+- **npm**: 10.x or higher (included with Node.js)
+- **Git**: For version control
+- **Chrome**: Latest version (primary test browser)
 
-## 🚀 Instalación
+## 🚀 Installation
 
-1. **Clonar el repositorio**:
+1. **Clone the repository**:
 
    ```bash
    git clone https://github.com/sh4rkd/EpamMoi.git
    cd EpamMoi
    ```
 
-2. **Instalar dependencias**:
+2. **Install dependencies**:
 
    ```bash
    npm install
    ```
 
-3. **Verificar instalación**:
+3. **Verify installation**:
 
    ```bash
    npx cypress verify
    ```
 
-## 🧪 Ejecución de Tests
+## 🧪 Running Tests
 
-### Modo Interactivo (Cypress Test Runner)
+### Interactive Mode (Cypress Test Runner)
 
-Abre el Cypress Test Runner con interfaz gráfica:
+Open the Cypress Test Runner with a graphical interface:
 
 ```bash
 npm run cypress:open
 ```
 
-Esto abre la UI de Cypress donde puedes:
+This opens the Cypress UI where you can:
 
-- Seleccionar y ejecutar tests individuales
-- Ver la ejecución en tiempo real
-- Depurar con snapshots de time-travel
-- Inspeccionar elementos DOM
+- Select and run individual tests
+- See live test execution
+- Debug with time-travel snapshots
+- Inspect DOM elements
 
-### Modo Headless (CI/Local)
+### Headless Mode (CI/Local)
 
-Ejecuta todos los tests en modo headless:
+Run all tests in headless mode:
 
 ```bash
 npm run cypress:run
 ```
 
-O usando el script de test:
+Or using the test script:
 
 ```bash
 npm test
 ```
 
-### Ejecutar Tests Específicos
+### Run Specific Tests
 
 ```bash
-# Ejecutar solo tests del usuario estándar
+# Run only standard user tests
 npx cypress run --spec "cypress/e2e/standard-user.cy.ts"
 
-# Ejecutar solo tests de usuarios especiales
+# Run only special user tests
 npx cypress run --spec "cypress/e2e/*-user.cy.ts"
 ```
 
-### Ejecutar en Navegador Específico
+### Run in Specific Browser
 
 ```bash
 # Firefox
@@ -192,9 +192,9 @@ npx cypress run --browser firefox
 npx cypress run --browser edge
 ```
 
-## 🔍 Verificación de Tipos
+## 🔍 Type Checking
 
-Ejecuta la verificación de tipos de TypeScript:
+Run TypeScript type checking:
 
 ```bash
 npm run type-check
@@ -202,22 +202,22 @@ npm run type-check
 
 ## 🔄 CI/CD
 
-Este proyecto incluye un workflow de GitHub Actions que:
+This project includes a GitHub Actions workflow that:
 
-- ✅ Se ejecuta en cada push y pull request
-- ✅ Usa Node.js 20.x
-- ✅ Ejecuta todos los tests en modo headless
-- ✅ Sube screenshots y videos como artefactos en caso de fallos
-- ✅ Verifica tipos de TypeScript
-- ✅ Proporciona resultados de tests en la pestaña Actions
+- ✅ Runs on every push and pull request
+- ✅ Uses Node.js 20.x
+- ✅ Executes all tests in headless mode
+- ✅ Uploads screenshots and videos as artifacts on failure
+- ✅ Verifies TypeScript types
+- ✅ Provides test results in the Actions tab
 
-Ver el workflow: `.github/workflows/ci.yml`
+View the workflow: `.github/workflows/ci.yml`
 
-## 🏛️ Arquitectura
+## 🏛️ Architecture
 
 ### Page Object Model
 
-Este framework sigue un patrón estricto de Page Object Model:
+This framework follows a strict Page Object Model pattern:
 
 ```typescript
 // Page Object (LoginPage.ts)
@@ -242,28 +242,28 @@ it("should login successfully", () => {
 });
 ```
 
-**Principios Clave**:
+**Key Principles**:
 
-- Los selectores de elementos son **privados** y encapsulados en Page Objects
-- Los tests interactúan solo con **métodos de acción públicos**
-- No hay llamadas `cy.get()` directas en archivos de test
-- Los métodos de verificación comprueban estados esperados
+- Element selectors are **private** and encapsulated in Page Objects
+- Tests interact only with **public action methods**
+- No direct `cy.get()` calls in test files
+- Verification methods check expected states
 
 ### Custom Commands
 
-Comandos personalizados de Cypress disponibles:
+Custom Cypress commands available:
 
 ```typescript
-// Login con credenciales
+// Login with credentials
 cy.login("standard_user", "secret_sauce");
 
-// Login con usuario del fixture
+// Login with user from fixture
 cy.login(users.usernames.standard, users.password);
 ```
 
-## 📝 Datos de Prueba
+## 📝 Test Data
 
-Los datos de prueba se gestionan en fixtures:
+Test data is managed in fixtures:
 
 ```json
 // cypress/fixtures/users.json
@@ -280,11 +280,11 @@ Los datos de prueba se gestionan en fixtures:
 }
 ```
 
-## 📸 Resultados de Tests
+## 📸 Test Results
 
 ### Screenshots
 
-Los tests fallidos capturan automáticamente screenshots guardados en:
+Failed tests automatically capture screenshots saved to:
 
 ```
 cypress/screenshots/
@@ -292,27 +292,27 @@ cypress/screenshots/
 
 ### Videos
 
-Los videos de ejecución de tests se guardan en:
+Test execution videos are saved to:
 
 ```
 cypress/videos/
 ```
 
-### Reportes HTML
+### HTML Reports
 
-Cypress genera reportes detallados de tests después de cada ejecución, visibles en la salida de la terminal.
+Cypress generates detailed test reports after each execution, visible in the terminal output.
 
 ## 🐛 Troubleshooting
 
-### Cypress Binary No Encontrado
+### Cypress Binary Not Found
 
 ```bash
 npx cypress install --force
 ```
 
-### Puerto 3000 Ya en Uso
+### Port 3000 Already in Use
 
-Mata el proceso usando el puerto 3000:
+Kill the process using port 3000:
 
 ```bash
 # Windows
@@ -323,54 +323,54 @@ taskkill /PID <PID> /F
 lsof -ti:3000 | xargs kill -9
 ```
 
-### Errores de TypeScript
+### TypeScript Errors
 
-Asegúrate de que las dependencias estén instaladas:
+Ensure dependencies are installed:
 
 ```bash
 npm install
 ```
 
-### Timeouts de Tests
+### Test Timeouts
 
-Aumenta el timeout en `cypress.config.ts`:
+Increase timeout in `cypress.config.ts`:
 
 ```typescript
 defaultCommandTimeout: 15000,
 pageLoadTimeout: 45000,
 ```
 
-## 🤝 Contribuir
+## 🤝 Contributing
 
-1. Crea una rama de feature: `git checkout -b feature/tu-feature`
-2. Sigue el patrón Page Object Model
-3. Asegúrate de que todos los tests pasen: `npm run cypress:run`
-4. Ejecuta verificación de tipos: `npm run type-check`
-5. Envía un pull request
+1. Create a feature branch: `git checkout -b feature/your-feature`
+2. Follow the Page Object Model pattern
+3. Ensure all tests pass: `npm run cypress:run`
+4. Run type checking: `npm run type-check`
+5. Submit a pull request
 
-## 📚 Mejores Prácticas
+## 📚 Best Practices
 
-- ✅ **Independencia de Tests**: Cada test se ejecuta en aislamiento
-- ✅ **Esperas Explícitas**: Usa el waiting automático de Cypress, evita esperas fijas
-- ✅ **Nombres de Tests Claros**: Bloques `it()` descriptivos
-- ✅ **Encapsulación de Page Objects**: Mantén selectores privados
-- ✅ **Testing Basado en Datos**: Usa fixtures para datos de prueba
-- ✅ **Limpieza Adecuada**: Resetea el estado entre tests
+- ✅ **Test Independence**: Each test runs in isolation
+- ✅ **Explicit Waits**: Use Cypress automatic waiting, avoid fixed waits
+- ✅ **Clear Test Names**: Descriptive `it()` blocks
+- ✅ **Page Object Encapsulation**: Keep selectors private
+- ✅ **Data-Driven Testing**: Use fixtures for test data
+- ✅ **Proper Cleanup**: Reset state between tests
 
-## 📄 Licencia
+## 📄 License
 
 ISC
 
-## 👤 Autor
+## 👤 Author
 
-Tu Nombre
+**Fred Miramontes**
 
-## 🔗 Recursos
+## 🔗 Resources
 
-- [Documentación de Cypress](https://docs.cypress.io/)
-- [Aplicación SauceDemo](https://www.saucedemo.com/)
+- [Cypress Documentation](https://docs.cypress.io/)
+- [SauceDemo Application](https://www.saucedemo.com/)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 
 ---
 
-⭐ Si este proyecto te resulta útil, considera darle una estrella en GitHub!
+⭐ If you find this project useful, consider giving it a star on GitHub!
