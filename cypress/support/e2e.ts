@@ -1,8 +1,10 @@
 import "./commands";
 
 Cypress.on("uncaught:exception", () => {
-  // Evita que fallos ajenos a la prueba en la app bajo prueba rompan la ejecución.
   return false;
 });
 
-
+beforeEach(function () {
+  const testTitle = this.currentTest?.fullTitle() ?? "Untitled scenario";
+  cy.task("log", `Starting scenario: ${testTitle}`);
+});

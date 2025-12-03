@@ -1,5 +1,3 @@
-import cartPage from "../pages/CartPage";
-import inventoryPage from "../pages/InventoryPage";
 import { users } from "../support/data/users";
 
 describe("Problem User Tests", () => {
@@ -8,21 +6,16 @@ describe("Problem User Tests", () => {
 
   const loginAndOpenInventory = () => {
     cy.login(username, password);
-    inventoryPage.waitForLoad();
+    cy.inventoryWaitForLoad();
   };
-
-  beforeEach(function () {
-    const testTitle = this.currentTest?.title ?? "Untitled scenario";
-    cy.task("log", `Starting scenario: ${testTitle}`);
-  });
 
   describe("Authentication", () => {
     it("allows login and displays inventory", () => {
       cy.login(username, password);
-      inventoryPage.waitForLoad();
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryWaitForLoad();
+      cy.inventoryGetAllProducts().then((products) => {
         expect(products.length).to.be.greaterThan(0);
-        inventoryPage.assertInventoryCount(products.length);
+        cy.inventoryAssertInventoryCount(products.length);
       });
     });
   });
@@ -33,32 +26,32 @@ describe("Problem User Tests", () => {
     });
 
     it("lets the problem user recover by resetting the cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) =>
-          inventoryPage.addProductToCart(item)
+          cy.inventoryAddProduct(item)
         );
-        inventoryPage.assertCartBadgeAtLeast(1);
+        cy.inventoryAssertCartBadgeAtLeast(1);
 
-        inventoryPage.resetAppState();
-        inventoryPage.assertCartBadgeCleared();
+        cy.inventoryResetAppState();
+        cy.inventoryAssertCartBadgeCleared();
       });
     });
 
     it("can add items to cart despite problems", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.assertCartBadgeAtLeast(1);
+        cy.inventoryAddProduct(productName);
+        cy.inventoryAssertCartBadgeAtLeast(1);
       });
     });
 
     it("can navigate to cart page", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.assertNumberOfItems(1);
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartAssertNumberOfItems(1);
       });
     });
   });
@@ -69,9 +62,9 @@ describe("Problem User Tests", () => {
     });
 
     it("displays all available products", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         expect(products.length).to.be.greaterThan(0);
-        inventoryPage.assertInventoryCount(products.length);
+        cy.inventoryAssertInventoryCount(products.length);
         products.forEach((product) => {
           cy.contains(".inventory_item_name", product.name).should(
             "be.visible"
@@ -83,27 +76,27 @@ describe("Problem User Tests", () => {
     });
 
     it("sorts products from A to Z", () => {
-      inventoryPage.sortBy("az");
-      inventoryPage.assertProductsSortedByName("asc");
+      cy.inventorySort("az");
+      cy.inventoryAssertProductsSortedByName("asc");
     });
 
     it("sorts products from Z to A", () => {
-      inventoryPage.sortBy("za");
-      inventoryPage.assertProductsSortedByName("desc");
+      cy.inventorySort("za");
+      cy.inventoryAssertProductsSortedByName("desc");
     });
 
     it("sorts products by price low to high", () => {
-      inventoryPage.sortBy("lohi");
-      inventoryPage.assertProductsSortedByPrice("asc");
+      cy.inventorySort("lohi");
+      cy.inventoryAssertProductsSortedByPrice("asc");
     });
 
     it("sorts products by price high to low", () => {
-      inventoryPage.sortBy("hilo");
-      inventoryPage.assertProductsSortedByPrice("desc");
+      cy.inventorySort("hilo");
+      cy.inventoryAssertProductsSortedByPrice("desc");
     });
 
     it("displays products even with potential image issues", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         expect(products.length).to.be.greaterThan(0);
         // El problem_user puede tener imágenes incorrectas, pero los productos se muestran
         products.forEach((product) => {
@@ -121,39 +114,39 @@ describe("Problem User Tests", () => {
     });
 
     it("adds multiple items to cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 3).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.assertCartBadgeAtLeast(3);
+        cy.inventoryAssertCartBadgeAtLeast(3);
       });
     });
 
     it("removes item from cart on inventory page", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.assertCartBadgeAtLeast(1);
+        cy.inventoryAddProduct(productName);
+        cy.inventoryAssertCartBadgeAtLeast(1);
 
-        inventoryPage.removeProductFromCart(productName);
-        inventoryPage.verifyItemIsNotInCart(productName);
+        cy.inventoryRemoveProduct(productName);
+        cy.inventoryVerifyItemIsNotInCart(productName);
       });
     });
 
     it("updates cart badge when adding and removing items", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const product1 = products[0].name;
         const product2 = products[1].name;
 
-        inventoryPage.addProductToCart(product1);
-        inventoryPage.assertCartBadgeAtLeast(1);
+        cy.inventoryAddProduct(product1);
+        cy.inventoryAssertCartBadgeAtLeast(1);
 
-        inventoryPage.addProductToCart(product2);
-        inventoryPage.assertCartBadgeAtLeast(2);
+        cy.inventoryAddProduct(product2);
+        cy.inventoryAssertCartBadgeAtLeast(2);
 
-        inventoryPage.removeProductFromCart(product1);
-        inventoryPage.assertCartBadgeAtLeast(1);
+        cy.inventoryRemoveProduct(product1);
+        cy.inventoryAssertCartBadgeAtLeast(1);
       });
     });
   });
@@ -164,48 +157,52 @@ describe("Problem User Tests", () => {
     });
 
     it("displays correct item in cart after adding from inventory", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
-        cartPage.verifyCartItemCount(1);
-        cartPage.verifyItemInCart(productName);
+        cy.cartVerifyCartPageIsDisplayed();
+        cy.cartVerifyCartItemCount(1);
+        cy.cartVerifyItemInCart(productName);
       });
     });
 
     it("displays multiple items with correct details", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
-        cartPage.verifyCartItemCount(2);
+        cy.cartVerifyCartPageIsDisplayed();
+        cy.cartVerifyCartItemCount(2);
         selectedProducts.forEach((item) => {
-          cartPage.verifyItemInCart(item);
+          cy.cartVerifyItemInCart(item);
         });
       });
     });
 
     it("removes item from cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
-        cartPage.verifyCartItemCount(2);
+        cy.inventoryOpenCart();
+        cy.cartVerifyCartItemCount(2);
 
-        cartPage.removeItem(selectedProducts[0]);
-        cartPage.verifyCartItemCount(1);
-        cartPage.verifyItemNotInCart(selectedProducts[0]);
+        cy.cartRemoveItem(selectedProducts[0]);
+        cy.cartVerifyCartItemCount(1);
+        cy.cartVerifyItemNotInCart(selectedProducts[0]);
       });
     });
   });
 });
+
+
+
+
 
 

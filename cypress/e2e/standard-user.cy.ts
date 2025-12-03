@@ -1,11 +1,5 @@
 import { faker } from "@faker-js/faker";
-import cartPage from "../pages/CartPage";
-import checkoutCompletePage from "../pages/CheckoutCompletePage";
-import checkoutInformationPage, {
-  CustomerInformation,
-} from "../pages/CheckoutInformationPage";
-import checkoutOverviewPage from "../pages/CheckoutOverviewPage";
-import inventoryPage from "../pages/InventoryPage";
+import { CustomerInformation } from "../pages/CheckoutInformationPage";
 import { users } from "../support/data/users";
 
 describe("Standard User Tests", () => {
@@ -14,21 +8,16 @@ describe("Standard User Tests", () => {
 
   const loginAndOpenInventory = () => {
     cy.login(username, password);
-    inventoryPage.waitForLoad();
+    cy.inventoryWaitForLoad();
   };
-
-  beforeEach(function () {
-    const testTitle = this.currentTest?.title ?? "Untitled scenario";
-    cy.task("log", `Starting scenario: ${testTitle}`);
-  });
 
   describe("Authentication", () => {
     it("allows login and displays inventory", () => {
       cy.login(username, password);
-      inventoryPage.waitForLoad();
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryWaitForLoad();
+      cy.inventoryGetAllProducts().then((products) => {
         expect(products.length).to.be.greaterThan(0);
-        inventoryPage.assertInventoryCount(products.length);
+        cy.inventoryAssertInventoryCount(products.length);
       });
     });
   });
@@ -39,9 +28,9 @@ describe("Standard User Tests", () => {
     });
 
     it("displays all available products", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         expect(products.length).to.be.greaterThan(0);
-        inventoryPage.assertInventoryCount(products.length);
+        cy.inventoryAssertInventoryCount(products.length);
         products.forEach((product) => {
           cy.contains(".inventory_item_name", product.name).should(
             "be.visible"
@@ -53,36 +42,36 @@ describe("Standard User Tests", () => {
     });
 
     it("sorts products A to Z by default", () => {
-      inventoryPage.verifyDefaultSort();
-      inventoryPage.assertProductsSortedByName("asc");
+      cy.inventoryVerifyDefaultSort();
+      cy.inventoryAssertProductsSortedByName("asc");
     });
 
     it("sorts products from Z to A", () => {
-      inventoryPage.sortBy("za");
-      inventoryPage.assertProductsSortedByName("desc");
+      cy.inventorySort("za");
+      cy.inventoryAssertProductsSortedByName("desc");
     });
 
     it("sorts products from A to Z", () => {
-      inventoryPage.sortBy("az");
-      inventoryPage.assertProductsSortedByName("asc");
+      cy.inventorySort("az");
+      cy.inventoryAssertProductsSortedByName("asc");
     });
 
     it("sorts products by price low to high", () => {
-      inventoryPage.sortBy("lohi");
-      inventoryPage.assertProductsSortedByPrice("asc");
+      cy.inventorySort("lohi");
+      cy.inventoryAssertProductsSortedByPrice("asc");
     });
 
     it("sorts products by price high to low", () => {
-      inventoryPage.sortBy("hilo");
-      inventoryPage.assertProductsSortedByPrice("desc");
+      cy.inventorySort("hilo");
+      cy.inventoryAssertProductsSortedByPrice("desc");
     });
 
     it("maintains sort order after adding item to cart", () => {
-      inventoryPage.sortBy("hilo");
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventorySort("hilo");
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.assertProductsSortedByPrice("desc");
+        cy.inventoryAddProduct(productName);
+        cy.inventoryAssertProductsSortedByPrice("desc");
         cy.get("[data-test='product-sort-container']").should(
           "have.value",
           "hilo"
@@ -91,38 +80,38 @@ describe("Standard User Tests", () => {
     });
 
     it("can change sort order multiple times", () => {
-      inventoryPage.sortBy("az");
-      inventoryPage.assertProductsSortedByName("asc");
+      cy.inventorySort("az");
+      cy.inventoryAssertProductsSortedByName("asc");
 
-      inventoryPage.sortBy("za");
-      inventoryPage.assertProductsSortedByName("desc");
+      cy.inventorySort("za");
+      cy.inventoryAssertProductsSortedByName("desc");
 
-      inventoryPage.sortBy("lohi");
-      inventoryPage.assertProductsSortedByPrice("asc");
+      cy.inventorySort("lohi");
+      cy.inventoryAssertProductsSortedByPrice("asc");
 
-      inventoryPage.sortBy("hilo");
-      inventoryPage.assertProductsSortedByPrice("desc");
+      cy.inventorySort("hilo");
+      cy.inventoryAssertProductsSortedByPrice("desc");
 
-      inventoryPage.sortBy("az");
-      inventoryPage.assertProductsSortedByName("asc");
+      cy.inventorySort("az");
+      cy.inventoryAssertProductsSortedByName("asc");
     });
 
     it("displays all 6 inventory items regardless of sort order", () => {
       const expectedItemCount = 6;
-      inventoryPage.assertInventoryCount(expectedItemCount);
+      cy.inventoryAssertInventoryCount(expectedItemCount);
 
-      inventoryPage.sortBy("za");
-      inventoryPage.assertInventoryCount(expectedItemCount);
+      cy.inventorySort("za");
+      cy.inventoryAssertInventoryCount(expectedItemCount);
 
-      inventoryPage.sortBy("lohi");
-      inventoryPage.assertInventoryCount(expectedItemCount);
+      cy.inventorySort("lohi");
+      cy.inventoryAssertInventoryCount(expectedItemCount);
 
-      inventoryPage.sortBy("hilo");
-      inventoryPage.assertInventoryCount(expectedItemCount);
+      cy.inventorySort("hilo");
+      cy.inventoryAssertInventoryCount(expectedItemCount);
     });
 
     it("displays correct images for each product", () => {
-      inventoryPage.assertProductImagesMatchNames();
+      cy.inventoryAssertProductImagesMatchNames();
     });
   });
 
@@ -132,112 +121,112 @@ describe("Standard User Tests", () => {
     });
 
     it("adds single item to cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.verifyItemIsInCart(productName);
-        inventoryPage.assertCartBadgeCount(1);
+        cy.inventoryAddProduct(productName);
+        cy.inventoryVerifyItemIsInCart(productName);
+        cy.inventoryAssertCartBadgeCount(1);
       });
     });
 
     it("adds multiple items to cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 3).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
-          inventoryPage.verifyItemIsInCart(item);
+          cy.inventoryAddProduct(item);
+          cy.inventoryVerifyItemIsInCart(item);
         });
-        inventoryPage.assertCartBadgeCount(3);
+        cy.inventoryAssertCartBadgeCount(3);
       });
     });
 
     it("removes item from cart on inventory page", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.assertCartBadgeCount(1);
+        cy.inventoryAddProduct(productName);
+        cy.inventoryAssertCartBadgeCount(1);
 
-        inventoryPage.removeProductFromCart(productName);
-        inventoryPage.verifyItemIsNotInCart(productName);
-        inventoryPage.assertCartBadgeCleared();
+        cy.inventoryRemoveProduct(productName);
+        cy.inventoryVerifyItemIsNotInCart(productName);
+        cy.inventoryAssertCartBadgeCleared();
       });
     });
 
     it("updates cart badge when adding and removing items", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const product1 = products[0].name;
         const product2 = products[1].name;
         const product3 = products[2].name;
 
-        inventoryPage.addProductToCart(product1);
-        inventoryPage.assertCartBadgeCount(1);
+        cy.inventoryAddProduct(product1);
+        cy.inventoryAssertCartBadgeCount(1);
 
-        inventoryPage.addProductToCart(product2);
-        inventoryPage.assertCartBadgeCount(2);
+        cy.inventoryAddProduct(product2);
+        cy.inventoryAssertCartBadgeCount(2);
 
-        inventoryPage.addProductToCart(product3);
-        inventoryPage.assertCartBadgeCount(3);
+        cy.inventoryAddProduct(product3);
+        cy.inventoryAssertCartBadgeCount(3);
 
-        inventoryPage.removeProductFromCart(product2);
-        inventoryPage.assertCartBadgeCount(2);
+        cy.inventoryRemoveProduct(product2);
+        cy.inventoryAssertCartBadgeCount(2);
 
-        inventoryPage.removeProductFromCart(product1);
-        inventoryPage.assertCartBadgeCount(1);
+        cy.inventoryRemoveProduct(product1);
+        cy.inventoryAssertCartBadgeCount(1);
 
-        inventoryPage.removeProductFromCart(product3);
-        inventoryPage.assertCartBadgeCleared();
+        cy.inventoryRemoveProduct(product3);
+        cy.inventoryAssertCartBadgeCleared();
       });
     });
 
     it("adds all items to cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         products.forEach((product) => {
-          inventoryPage.addProductToCart(product.name);
+          cy.inventoryAddProduct(product.name);
         });
-        inventoryPage.assertCartBadgeCount(products.length);
+        cy.inventoryAssertCartBadgeCount(products.length);
       });
     });
 
     it("navigates to cart page when clicking cart icon", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.verifyCartPageIsDisplayed();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartVerifyCartPageIsDisplayed();
       });
     });
 
     it("persists cart items after navigation", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
 
-        inventoryPage.openCart();
-        cartPage.continueShopping();
-        inventoryPage.waitForLoad();
+        cy.inventoryOpenCart();
+        cy.cartContinueShopping();
+        cy.inventoryWaitForLoad();
 
-        inventoryPage.assertCartBadgeCount(2);
+        cy.inventoryAssertCartBadgeCount(2);
         selectedProducts.forEach((item) => {
-          inventoryPage.verifyItemIsInCart(item);
+          cy.inventoryVerifyItemIsInCart(item);
         });
       });
     });
 
     it("verifies item button text changes after adding to cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
         cy.contains(".inventory_item", productName)
           .find("button")
           .should("contain.text", "Add to cart");
 
-        inventoryPage.addProductToCart(productName);
+        cy.inventoryAddProduct(productName);
         cy.contains(".inventory_item", productName)
           .find("button")
           .should("contain.text", "Remove");
 
-        inventoryPage.removeProductFromCart(productName);
+        cy.inventoryRemoveProduct(productName);
         cy.contains(".inventory_item", productName)
           .find("button")
           .should("contain.text", "Add to cart");
@@ -245,7 +234,7 @@ describe("Standard User Tests", () => {
     });
 
     it("verifies cart is empty by default", () => {
-      inventoryPage.assertCartBadgeCleared();
+      cy.inventoryAssertCartBadgeCleared();
     });
   });
 
@@ -255,153 +244,153 @@ describe("Standard User Tests", () => {
     });
 
     it("displays empty cart message when no items added", () => {
-      inventoryPage.openCart();
-      cartPage.verifyCartPageIsDisplayed();
-      cartPage.verifyCartIsEmpty();
+      cy.inventoryOpenCart();
+      cy.cartVerifyCartPageIsDisplayed();
+      cy.cartVerifyCartIsEmpty();
     });
 
     it("displays correct item in cart after adding from inventory", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
-        cartPage.verifyCartItemCount(1);
-        cartPage.verifyItemInCart(productName);
+        cy.cartVerifyCartPageIsDisplayed();
+        cy.cartVerifyCartItemCount(1);
+        cy.cartVerifyItemInCart(productName);
       });
     });
 
     it("displays multiple items with correct details", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 3).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
-        cartPage.verifyCartItemCount(3);
+        cy.cartVerifyCartPageIsDisplayed();
+        cy.cartVerifyCartItemCount(3);
         selectedProducts.forEach((item) => {
-          cartPage.verifyItemInCart(item);
+          cy.cartVerifyItemInCart(item);
         });
       });
     });
 
     it("displays correct item prices in cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const product = products[0];
-        inventoryPage.addProductToCart(product.name);
-        inventoryPage.openCart();
+        cy.inventoryAddProduct(product.name);
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
-        cartPage.getItemPrice(product.name).should("contain.text", "$");
-        cartPage
-          .getItemPrice(product.name)
-          .should("contain.text", product.price.replace("$", ""));
+        cy.cartVerifyCartPageIsDisplayed();
+        cy.cartGetItemPrice(product.name).should("contain.text", "$");
+        cy.cartGetItemPrice(product.name).should(
+          "contain.text",
+          product.price.replace("$", "")
+        );
       });
     });
 
     it("displays quantity as 1 for each item", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
+        cy.inventoryOpenCart();
 
         selectedProducts.forEach((item) => {
-          cartPage.verifyItemQuantity(item, 1);
+          cy.cartVerifyItemQuantity(item, 1);
         });
       });
     });
 
     it("removes item from cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
-        cartPage.verifyCartItemCount(2);
+        cy.inventoryOpenCart();
+        cy.cartVerifyCartItemCount(2);
 
-        cartPage.removeItem(selectedProducts[0]);
-        cartPage.verifyCartItemCount(1);
-        cartPage.verifyItemNotInCart(selectedProducts[0]);
-        cartPage.verifyItemInCart(selectedProducts[1]);
+        cy.cartRemoveItem(selectedProducts[0]);
+        cy.cartVerifyCartItemCount(1);
+        cy.cartVerifyItemNotInCart(selectedProducts[0]);
+        cy.cartVerifyItemInCart(selectedProducts[1]);
       });
     });
 
     it("removes all items from cart", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
+        cy.inventoryOpenCart();
 
         selectedProducts.forEach((item) => {
-          cartPage.removeItem(item);
+          cy.cartRemoveItem(item);
         });
 
-        cartPage.verifyCartIsEmpty();
+        cy.cartVerifyCartIsEmpty();
       });
     });
 
     it("navigates back to inventory with Continue Shopping", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
 
-        cartPage.continueShopping();
-        inventoryPage.waitForLoad();
+        cy.cartContinueShopping();
+        cy.inventoryWaitForLoad();
         cy.url().should("include", "/inventory.html");
       });
     });
 
     it("maintains cart badge count sync with cart items", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 2).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.assertCartBadgeCount(2);
+        cy.inventoryAssertCartBadgeCount(2);
 
-        inventoryPage.openCart();
-        cartPage.verifyCartItemCount(2);
+        cy.inventoryOpenCart();
+        cy.cartVerifyCartItemCount(2);
 
-        cartPage.removeItem(selectedProducts[0]);
-        cartPage.continueShopping();
-        inventoryPage.waitForLoad();
-        inventoryPage.assertCartBadgeCount(1);
+        cy.cartRemoveItem(selectedProducts[0]);
+        cy.cartContinueShopping();
+        cy.inventoryWaitForLoad();
+        cy.inventoryAssertCartBadgeCount(1);
       });
     });
 
     it("displays checkout button when cart has items", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const productName = products[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
 
         cy.get("[data-test='checkout']").should("be.visible").and("be.enabled");
       });
     });
 
     it("displays all cart item details correctly", () => {
-      inventoryPage.getAllProducts().then((products) => {
+      cy.inventoryGetAllProducts().then((products) => {
         const selectedProducts = products.slice(0, 3).map((p) => p.name);
         selectedProducts.forEach((item) => {
-          inventoryPage.addProductToCart(item);
+          cy.inventoryAddProduct(item);
         });
-        inventoryPage.openCart();
+        cy.inventoryOpenCart();
 
-        cartPage.verifyCartPageIsDisplayed();
+        cy.cartVerifyCartPageIsDisplayed();
         selectedProducts.forEach((item) => {
-          cartPage.verifyItemInCart(item);
-          cartPage.getItemPrice(item).should("be.visible");
-          cartPage
-            .getItemQuantity(item)
+          cy.cartVerifyItemInCart(item);
+          cy.cartGetItemPrice(item).should("be.visible");
+          cy.cartGetItemQuantity(item)
             .should("be.visible")
             .and("have.text", "1");
         });
@@ -415,239 +404,228 @@ describe("Standard User Tests", () => {
     });
 
     it("allows completing an end-to-end purchase", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const selectedProducts = allProducts.slice(0, 2).map((p) => p.name);
-        selectedProducts.forEach((item) =>
-          inventoryPage.addProductToCart(item)
-        );
-        inventoryPage.assertCartBadgeCount(selectedProducts.length);
-        inventoryPage.openCart();
+        selectedProducts.forEach((item) => cy.inventoryAddProduct(item));
+        cy.inventoryAssertCartBadgeCount(selectedProducts.length);
+        cy.inventoryOpenCart();
 
-        cartPage.assertItems(selectedProducts);
-        cartPage.assertNumberOfItems(selectedProducts.length);
-        cartPage.checkout();
+        cy.cartAssertItems(selectedProducts);
+        cy.cartAssertNumberOfItems(selectedProducts.length);
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.assertItems(selectedProducts);
-        checkoutOverviewPage.assertSubtotalIsGreaterThan(0);
-        checkoutOverviewPage.finish();
+        cy.checkoutOverviewAssertItems(selectedProducts);
+        cy.checkoutOverviewAssertSubtotalGreaterThan(0);
+        cy.checkoutOverviewFinish();
 
-        checkoutCompletePage.assertSuccessMessage();
-        checkoutCompletePage.backToProducts();
-        inventoryPage.assertCartBadgeCleared();
+        cy.checkoutAssertSuccessMessage();
+        cy.checkoutBackToProducts();
+        cy.inventoryAssertCartBadgeCleared();
       });
     });
 
     it("displays correct item details in checkout overview", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const selectedProducts = allProducts.slice(0, 2).map((p) => p.name);
-        selectedProducts.forEach((item) =>
-          inventoryPage.addProductToCart(item)
-        );
-        inventoryPage.openCart();
-        cartPage.checkout();
+        selectedProducts.forEach((item) => cy.inventoryAddProduct(item));
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
-        checkoutOverviewPage.getSummaryItemCount().should("eq", 2);
+        cy.checkoutOverviewVerifyStepTwo();
+        cy.checkoutOverviewGetSummaryItemCount().should("eq", 2);
         selectedProducts.forEach((item) => {
-          checkoutOverviewPage.verifyItemInSummary(item);
+          cy.checkoutOverviewVerifyItemInSummary(item);
         });
       });
     });
 
     it("displays payment and shipping information", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
-        checkoutOverviewPage.verifyPaymentInformationIsDisplayed();
-        checkoutOverviewPage.verifyShippingInformationIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
+        cy.checkoutOverviewVerifyPaymentInfo();
+        cy.checkoutOverviewVerifyShippingInfo();
       });
     });
 
     it("displays price summary with tax in checkout overview", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
-        checkoutOverviewPage
-          .getItemTotal()
+        cy.checkoutOverviewVerifyStepTwo();
+        cy.checkoutOverviewGetItemTotal()
           .should("be.visible")
           .and("contain.text", "Item total:");
-        checkoutOverviewPage
-          .getTax()
+        cy.checkoutOverviewGetTax()
           .should("be.visible")
           .and("contain.text", "Tax:");
-        checkoutOverviewPage
-          .getTotal()
+        cy.checkoutOverviewGetTotal()
           .should("be.visible")
           .and("contain.text", "Total:");
       });
     });
 
     it("returns to inventory from checkout complete page", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
-        checkoutOverviewPage.finish();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
+        cy.checkoutOverviewFinish();
 
-        checkoutCompletePage.assertSuccessMessage();
-        checkoutCompletePage.backToProducts();
-        inventoryPage.waitForLoad();
+        cy.checkoutAssertSuccessMessage();
+        cy.checkoutBackToProducts();
+        cy.inventoryWaitForLoad();
         cy.url().should("include", "/inventory.html");
       });
     });
 
     it("checkouts with multiple items successfully", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const selectedProducts = allProducts.slice(0, 3).map((p) => p.name);
-        selectedProducts.forEach((item) =>
-          inventoryPage.addProductToCart(item)
-        );
-        inventoryPage.openCart();
-        cartPage.checkout();
+        selectedProducts.forEach((item) => cy.inventoryAddProduct(item));
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
-        checkoutOverviewPage.finish();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
+        cy.checkoutOverviewFinish();
 
-        checkoutCompletePage.assertSuccessMessage();
+        cy.checkoutAssertSuccessMessage();
       });
     });
 
     it("accepts various postal code formats", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: "AB123CD",
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
       });
     });
 
     it("handles long names in checkout form", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: "Christopher Alexander",
           lastName: "Montgomery-Richardson",
           postalCode: "12345",
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
       });
     });
 
     it("completes checkout with single character names", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         const customer: CustomerInformation = {
           firstName: "A",
           lastName: "B",
           postalCode: "1",
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
-        checkoutOverviewPage.finish();
-        checkoutCompletePage.assertSuccessMessage();
+        cy.checkoutOverviewVerifyStepTwo();
+        cy.checkoutOverviewFinish();
+        cy.checkoutAssertSuccessMessage();
       });
     });
 
     it("maintains cart contents through checkout flow", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const selectedProducts = allProducts.slice(0, 2).map((p) => p.name);
-        selectedProducts.forEach((item) =>
-          inventoryPage.addProductToCart(item)
-        );
-        inventoryPage.openCart();
+        selectedProducts.forEach((item) => cy.inventoryAddProduct(item));
+        cy.inventoryOpenCart();
         selectedProducts.forEach((item) => {
-          cartPage.verifyItemInCart(item);
+          cy.cartVerifyItemInCart(item);
         });
 
-        cartPage.checkout();
+        cy.cartCheckout();
         const customer: CustomerInformation = {
           firstName: faker.person.firstName(),
           lastName: faker.person.lastName(),
           postalCode: faker.location.zipCode(),
         };
-        checkoutInformationPage.fillCustomerInformation(customer);
-        checkoutInformationPage.continue();
+        cy.checkoutFillInformation(customer);
+        cy.checkoutContinue();
 
         selectedProducts.forEach((item) => {
-          checkoutOverviewPage.verifyItemInSummary(item);
+          cy.checkoutOverviewVerifyItemInSummary(item);
         });
       });
     });
@@ -659,225 +637,225 @@ describe("Standard User Tests", () => {
     });
 
     it("shows error when first name is missing", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "",
           lastName: "Doe",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("First Name is required");
+        cy.checkoutAssertError("First Name is required");
         cy.url().should("include", "/checkout-step-one.html");
       });
     });
 
     it("shows error when last name is missing", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("Last Name is required");
+        cy.checkoutAssertError("Last Name is required");
         cy.url().should("include", "/checkout-step-one.html");
       });
     });
 
     it("shows error when postal code is missing", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "Doe",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("Postal Code is required");
+        cy.checkoutAssertError("Postal Code is required");
         cy.url().should("include", "/checkout-step-one.html");
       });
     });
 
     it("shows error when all fields are empty", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "",
           lastName: "",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("First Name is required");
+        cy.checkoutAssertError("First Name is required");
       });
     });
 
     it("shows error when only first name is provided", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("Last Name is required");
+        cy.checkoutAssertError("Last Name is required");
       });
     });
 
     it("shows error when only last name is provided", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "",
           lastName: "Doe",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("First Name is required");
+        cy.checkoutAssertError("First Name is required");
       });
     });
 
     it("shows error when only postal code is provided", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "",
           lastName: "",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("First Name is required");
+        cy.checkoutAssertError("First Name is required");
       });
     });
 
     it("allows retry after validation error", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "Doe",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
-        checkoutInformationPage.assertError("Postal Code is required");
+        cy.checkoutContinue();
+        cy.checkoutAssertError("Postal Code is required");
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "Doe",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
       });
     });
 
     it("handles special characters in name fields", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John-O'Brien",
           lastName: "Smith-Jones",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
       });
     });
 
     it("handles numeric characters in name fields", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John123",
           lastName: "Doe456",
           postalCode: "12345",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutOverviewPage.verifyCheckoutStepTwoIsDisplayed();
+        cy.checkoutOverviewVerifyStepTwo();
       });
     });
 
     it("returns to cart when clicking Cancel button", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.cancel();
+        cy.checkoutCancel();
 
-        cartPage.verifyCartPageIsDisplayed();
+        cy.cartVerifyCartPageIsDisplayed();
         cy.url().should("include", "/cart.html");
       });
     });
 
     it("preserves entered data when validation fails", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "Doe",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
+        cy.checkoutContinue();
 
-        checkoutInformationPage.assertError("Postal Code is required");
+        cy.checkoutAssertError("Postal Code is required");
 
         cy.get("[data-test='firstName']").should("have.value", "John");
         cy.get("[data-test='lastName']").should("have.value", "Doe");
@@ -885,40 +863,40 @@ describe("Standard User Tests", () => {
     });
 
     it("validates field order for error messages", () => {
-      inventoryPage.getAllProducts().then((allProducts) => {
+      cy.inventoryGetAllProducts().then((allProducts) => {
         const productName = allProducts[0].name;
-        inventoryPage.addProductToCart(productName);
-        inventoryPage.openCart();
-        cartPage.checkout();
+        cy.inventoryAddProduct(productName);
+        cy.inventoryOpenCart();
+        cy.cartCheckout();
 
         // Test 1: All empty, should show First Name error
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "",
           lastName: "",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
-        checkoutInformationPage.assertError("First Name is required");
+        cy.checkoutContinue();
+        cy.checkoutAssertError("First Name is required");
 
         // Test 2: Only first name filled, should show Last Name error
         cy.reload();
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
-        checkoutInformationPage.assertError("Last Name is required");
+        cy.checkoutContinue();
+        cy.checkoutAssertError("Last Name is required");
 
         // Test 3: First and last name filled, should show Postal Code error
         cy.reload();
-        checkoutInformationPage.fillCustomerInformation({
+        cy.checkoutFillInformation({
           firstName: "John",
           lastName: "Doe",
           postalCode: "",
         });
-        checkoutInformationPage.continue();
-        checkoutInformationPage.assertError("Postal Code is required");
+        cy.checkoutContinue();
+        cy.checkoutAssertError("Postal Code is required");
       });
     });
   });
