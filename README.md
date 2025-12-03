@@ -24,7 +24,7 @@ End-to-end automation framework for testing the [SauceDemo](https://www.saucedem
 
 - ✅ **Cypress 15.7.0** - Modern and fast E2E testing framework
 - ✅ **TypeScript 5.9.3** - Type safety with strict mode
-- ✅ **Page Object Model** - Maintainable architecture with strict encapsulation
+- ✅ **Selector Registry + Commands** - Pages keep locators, commands handle flows
 - ✅ **113+ Tests** - Comprehensive coverage of critical user flows
 - ✅ **Custom Commands** - Reusable test utilities with full TypeScript support
 - ✅ **Test Fixtures** - Data-driven testing with centralized test data
@@ -98,7 +98,7 @@ cypress/
 │   └── locked-out-user.cy.ts     # Locked out user tests (7 tests)
 ├── fixtures/                     # Test data
 │   └── users.json                # User credentials
-├── pages/                        # Page Object Models
+├── pages/                        # Selector registries (no Cypress logic)
 │   ├── LoginPage.ts
 │   ├── InventoryPage.ts
 │   ├── CartPage.ts
@@ -107,10 +107,18 @@ cypress/
 │   ├── CheckoutCompletePage.ts
 │   └── ProductDetailsPage.ts
 └── support/                      # Custom commands and configuration
-    ├── commands.ts               # Custom Cypress commands
+    ├── commands.ts               # Type declarations + module registry
+    ├── commands/                 # Domain-specific custom commands
+    │   ├── login.ts
+    │   ├── inventory.ts
+    │   ├── cart.ts
+    │   ├── checkout-information.ts
+    │   ├── checkout-overview.ts
+    │   ├── checkout-complete.ts
+    │   └── product-details.ts
     ├── data/
     │   └── users.ts              # User types and data
-    └── e2e.ts                    # Global hooks and configuration
+    └── e2e.ts                    # Global hooks (logging, exception handling)
 ```
 
 ## 📦 Prerequisites
@@ -215,51 +223,54 @@ View the workflow: `.github/workflows/ci.yml`
 
 ## 🏛️ Architecture
 
-### Page Object Model
+### Selector-Only Page Objects
 
-This framework follows a strict Page Object Model pattern:
+Each file inside `cypress/pages` exports **only selectors and types**. This keeps element locators in a single place without leaking Cypress logic into the page layer. Example:
 
 ```typescript
-// Page Object (LoginPage.ts)
-class LoginPage {
-  private selectors = {
-    username: '[data-test="username"]',
-    password: '[data-test="password"]',
-    submit: '[data-test="login-button"]',
-  };
+// cypress/pages/LoginPage.ts
+export const loginSelectors = {
+  username: "[data-test='username']",
+  password: "[data-test='password']",
+  submit: "[data-test='login-button']",
+  error: "[data-test='error']",
+};
+```
 
-  login(username: string, password: string) {
-    cy.get(this.selectors.username).type(username);
-    cy.get(this.selectors.password).type(password);
-    cy.get(this.selectors.submit).click();
-  }
-}
+### Command-Centric Flow
 
-// Test file (standard-user.cy.ts)
-it("should login successfully", () => {
-  cy.login(users.usernames.standard, users.password);
-  inventoryPage.waitForLoad();
+All reusable flows live inside `cypress/support/commands/`. The index file `support/commands.ts` declares the `Cypress.Chainable` interface and registers each domain module (login, inventory, cart, checkout, etc.). Specs never access selectors directly; they rely on `cy.*` helpers:
+
+```typescript
+// cypress/support/commands/login.ts
+Cypress.Commands.add("login", (username: string, password = "secret_sauce") => {
+  cy.get(loginSelectors.username).clear().type(username);
+  cy.get(loginSelectors.password).clear().type(password);
+  cy.get(loginSelectors.submit).click();
 });
 ```
 
-**Key Principles**:
-
-- Element selectors are **private** and encapsulated in Page Objects
-- Tests interact only with **public action methods**
-- No direct `cy.get()` calls in test files
-- Verification methods check expected states
-
-### Custom Commands
-
-Custom Cypress commands available:
-
 ```typescript
-// Login with credentials
-cy.login("standard_user", "secret_sauce");
-
-// Login with user from fixture
-cy.login(users.usernames.standard, users.password);
+// cypress/e2e/standard-user.cy.ts
+it("completes the purchase flow", () => {
+  cy.login(users.usernames.standard, users.password);
+  cy.inventoryWaitForLoad();
+  cy.inventoryAddProduct("Sauce Labs Backpack");
+  cy.inventoryOpenCart();
+  cy.cartCheckout();
+  cy.checkoutFillInformation(customerData);
+  cy.checkoutContinue();
+  cy.checkoutOverviewFinish();
+  cy.checkoutAssertSuccessMessage();
+});
 ```
+
+**Key principles**:
+
+- Selectors live exclusively in `cypress/pages/*`.
+- `support/commands/*.ts` acts as the reusable command “monolith”.
+- Specs stay declarative by chaining meaningful `cy.*` helpers.
+- `support/e2e.ts` centralizes global hooks (logging, exception handling).
 
 ## 📝 Test Data
 
@@ -353,7 +364,8 @@ pageLoadTimeout: 45000,
 - ✅ **Test Independence**: Each test runs in isolation
 - ✅ **Explicit Waits**: Use Cypress automatic waiting, avoid fixed waits
 - ✅ **Clear Test Names**: Descriptive `it()` blocks
-- ✅ **Page Object Encapsulation**: Keep selectors private
+- ✅ **Selector Registry**: Keep locators centralized in `cypress/pages`
+- ✅ **Custom Commands**: Favor reusable `cy.*` helpers over in-test logic
 - ✅ **Data-Driven Testing**: Use fixtures for test data
 - ✅ **Proper Cleanup**: Reset state between tests
 

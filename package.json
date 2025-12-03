@@ -4,7 +4,7 @@
   "description": "Cypress e2e suite for SauceDemo",
   "main": "index.js",
   "scripts": {
-    "test": "npm run cypress:run",
+    "test": "npm run type-check && npm run cypress:run",
     "cypress:open": "cypress open --e2e",
     "cypress:run": "cypress run --e2e",
     "type-check": "tsc --noEmit"
