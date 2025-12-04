@@ -82,6 +82,13 @@ declare global {
       checkoutBackToProducts(): Chainable<void>;
 
       productDetailsBackToProducts(): Chainable<void>;
+
+      sauceInterceptServiceWorker(): Chainable<void>;
+      sauceInterceptAssets(): Chainable<void>;
+      sauceInterceptAnalytics(): Chainable<void>;
+      saucePrepareNetworkStubs(): Chainable<void>;
+      sauceBlockFonts(): Chainable<void>;
+      sauceBreakFirstProductImage(): Chainable<void>;
     }
   }
 }
@@ -90,6 +97,7 @@ import "./commands/cart";
 import "./commands/checkout-complete";
 import "./commands/checkout-information";
 import "./commands/checkout-overview";
+import "./commands/interceptors";
 import "./commands/inventory";
 import "./commands/login";
 import "./commands/product-details";

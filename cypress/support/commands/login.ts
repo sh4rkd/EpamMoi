@@ -1,6 +1,7 @@
 import { loginSelectors } from "../../pages/LoginPage";
 
 Cypress.Commands.add("loginVisit", () => {
+  cy.saucePrepareNetworkStubs();
   cy.visit("/");
 });
 

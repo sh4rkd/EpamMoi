@@ -272,6 +272,30 @@ it("completes the purchase flow", () => {
 - Specs stay declarative by chaining meaningful `cy.*` helpers.
 - `support/e2e.ts` centralizes global hooks (logging, exception handling).
 
+### Network Interceptors for SauceDemo
+
+Although the SauceDemo UI is static, the browser still makes deterministic network calls that we can control with Cypress:
+
+- `cy.sauceInterceptServiceWorker()` returns an empty service worker for `https://www.saucedemo.com/service-worker.js`, preventing test bleed.
+- `cy.sauceInterceptAssets()` intercepts `/static/js/main*.js` and `/static/css/main*.css`, exposing them as `@sauceBundle` and `@sauceStyles` so `cy.loginVisit()` can wait for each resource.
+- `cy.sauceInterceptAnalytics()` blocks both `OPTIONS` and `POST` requests to `https://events.backtrace.io/api/*/submit`, removing noise from default 401 responses.
+- `cy.saucePrepareNetworkStubs()` groups the three interceptors above and runs automatically during the login visit.
+- `cy.sauceBlockFonts()` neutralizes Google Fonts downloads to confirm the UI still lists products when external fonts fail.
+- `cy.sauceBreakFirstProductImage()` forces the first catalog image to respond with `404`, helping us stress-test inventory rendering.
+
+Use `cy.loginVisit()` (or any helper that calls it, such as `cy.login`) to ensure the baseline interceptors are active. Scenario-specific helpers like `cy.sauceBlockFonts` or `cy.sauceBreakFirstProductImage` can be executed before `cy.login` inside each spec.
+
+### Resilience scenarios
+
+The spec `cypress/e2e/scenarios/network-resilience.cy.ts` demonstrates several resilience checks built purely with network stubs:
+
+- Deterministic waits for the login bundle (`@sauceBundle`) and stylesheet (`@sauceStyles`).
+- Ability to add products to the cart even when the service worker is replaced.
+- Suppression of Backtrace analytics noise (both `OPTIONS` and `POST` respond `204`).
+- Inventory continuity when Google Fonts returns `204`.
+- Product listing stability when the first catalog image returns `404`.
+- Graceful handling when fonts and the first image fail at the same time.
+
 ## 📝 Test Data
 
 Test data is managed in fixtures:
